@@ -2,8 +2,9 @@ package com.library.service;
 
 import com.library.model.Book;
 import com.library.model.User;
-import com.library.repository.BookRepository;
-import com.library.repository.UserRepository;
+import com.library.repository.Repository;
+import com.library.model.Book;
+import com.library.model.User;
 import com.library.util.Logger;
 
 import java.util.List;
@@ -16,13 +17,13 @@ public class LibraryService {
 
     private static final int MAX_BORROWS = 5;
 
-    private final BookRepository bookRepository;
-    private final UserRepository userRepository;
+    private final Repository<Book, String> bookRepository;
+private final Repository<User, String> userRepository;
     private final Logger logger;
 
-    public LibraryService(BookRepository bookRepository,
-                          UserRepository userRepository,
-                          Logger logger) {
+    public LibraryService(Repository<Book, String> bookRepository,
+                      Repository<User, String> userRepository,
+                      Logger logger) {
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.logger = logger;
