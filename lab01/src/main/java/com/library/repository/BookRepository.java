@@ -8,11 +8,14 @@ import java.util.stream.Collectors;
 public class BookRepository implements BookRepositoryInterface {
     private final Map<String, Book> store = new LinkedHashMap<>();
 
-    @Override
-    public void save(Book book) {
-        Objects.requireNonNull(book, "Book must not be null");
-        store.put(book.getIsbn(), book);
+        @Override
+public void save(Book book) {
+    Objects.requireNonNull(book, "Book must not be null");
+    if (store.containsKey(book.getIsbn())) {
+        throw new IllegalArgumentException("Book with ISBN " + book.getIsbn() + " already exists");
     }
+    store.put(book.getIsbn(), book);
+}
 
     @Override
     public Optional<Book> findById(String isbn) {
