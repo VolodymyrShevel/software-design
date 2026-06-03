@@ -1,96 +1,96 @@
-# Programming Principles
+# Принципи програмування
 
-This document describes the programming principles applied in the **Online Library** project.
+У цьому документі описано принципи програмування, яких дотримано в проєкті **Online Library**.
 
 ---
 
 ## 1. SOLID
 
-### 1.1 Single Responsibility Principle (SRP)
+### 1.1 Принцип єдиної відповідальності (SRP)
 
-Each class has exactly one reason to change.
+Кожен клас має лише одну причину для змін.
 
-- [`Book`](src/main/java/com/library/model/Book.java) — stores book data only; no persistence or business logic.
-- [`LibraryService`](src/main/java/com/library/service/LibraryService.java) — handles borrow/return business logic only.
-- [`Logger`](src/main/java/com/library/util/Logger.java) — handles console output only; completely isolated from business logic.
-- [`BookController`](src/main/java/com/library/controller/BookController.java) and [`BorrowController`](src/main/java/com/library/controller/BorrowController.java) are split by responsibility: one manages book CRUD, the other manages borrowing operations.
+- [`Book`](src/main/java/com/library/model/Book.java) — зберігає лише дані про книгу, жодної бізнес-логіки чи роботи з базою.
+- [`LibraryService`](src/main/java/com/library/service/LibraryService.java) — відповідає виключно за логіку видачі та повернення книг.
+- [`Logger`](src/main/java/com/library/util/Logger.java) — відповідає лише за виведення повідомлень у консоль, повністю ізольований від бізнес-логіки.
+- [`BookController`](src/main/java/com/library/controller/BookController.java) і [`BorrowController`](src/main/java/com/library/controller/BorrowController.java) розділені за відповідальністю: перший керує книгами, другий — операціями видачі.
 
-### 1.2 Open/Closed Principle (OCP)
+### 1.2 Принцип відкритості/закритості (OCP)
 
-The [`Repository<T, ID>`](src/main/java/com/library/repository/Repository.java) interface allows adding new repository implementations (e.g., `DatabaseBookRepository`) without modifying existing code.
+Інтерфейс [`Repository<T, ID>`](src/main/java/com/library/repository/Repository.java) дозволяє додавати нові реалізації сховища (наприклад, `DatabaseBookRepository`) без жодних змін в існуючому коді.
 
-`LibraryService` depends on repository abstractions, so swapping the storage implementation requires zero changes to the service layer.
+`LibraryService` залежить від абстракцій репозиторіїв, тому заміна реалізації сховища не вимагає змін у сервісному шарі.
 
-### 1.3 Liskov Substitution Principle (LSP)
+### 1.3 Принцип підстановки Лісков (LSP)
 
-[`BookRepository`](src/main/java/com/library/repository/BookRepository.java) and [`UserRepository`](src/main/java/com/library/repository/UserRepository.java) both implement `Repository<T, ID>` and can be substituted wherever that interface is expected without altering program behavior.
+[`BookRepository`](src/main/java/com/library/repository/BookRepository.java) і [`UserRepository`](src/main/java/com/library/repository/UserRepository.java) реалізують `Repository<T, ID>` і можуть бути підставлені скрізь, де очікується цей інтерфейс, без порушення поведінки програми.
 
-### 1.4 Interface Segregation Principle (ISP)
+### 1.4 Принцип розділення інтерфейсів (ISP)
 
-The [`Repository<T, ID>`](src/main/java/com/library/repository/Repository.java) interface exposes only the four fundamental operations (`save`, `findById`, `findAll`, `delete`). Specific query methods (`findByGenre`, `findAvailable`) live in the concrete `BookRepository` class, not in the shared interface, so implementors are never forced to implement methods they don't need.
+Інтерфейс [`Repository<T, ID>`](src/main/java/com/library/repository/Repository.java) містить лише чотири базові операції (`save`, `findById`, `findAll`, `delete`). Специфічні методи (`findByGenre`, `findAvailable`) винесено в окремий [`BookRepositoryInterface`](src/main/java/com/library/repository/BookRepositoryInterface.java), щоб реалізатори не були змушені реалізовувати непотрібні їм методи.
 
-### 1.5 Dependency Inversion Principle (DIP)
+### 1.5 Принцип інверсії залежностей (DIP)
 
-[`LibraryService`](src/main/java/com/library/service/LibraryService.java#L26-L34) receives all its dependencies via constructor injection:
+[`LibraryService`](src/main/java/com/library/service/LibraryService.java#L26-L34) отримує всі залежності через конструктор:
 
 ```java
-public LibraryService(BookRepository bookRepository,
-                      UserRepository userRepository,
-                      Logger logger) { ... }
+public LibraryService(BookRepositoryInterface bookRepository,
+                      Repository<User, String> userRepository,
+                      ILogger logger) { ... }
 ```
 
-High-level policy (service) depends on abstractions passed from outside, not on concrete constructions.
+Клас вищого рівня (сервіс) залежить від абстракцій, а не від конкретних реалізацій.
 
 ---
 
-## 2. DRY (Don't Repeat Yourself)
+## 2. DRY (Don't Repeat Yourself — не повторюй себе)
 
-The generic [`Repository<T, ID>`](src/main/java/com/library/repository/Repository.java) interface captures the common CRUD contract once. Both `BookRepository` and `UserRepository` share this contract without duplicating method signatures.
+Узагальнений інтерфейс [`Repository<T, ID>`](src/main/java/com/library/repository/Repository.java) визначає спільний CRUD-контракт один раз. І `BookRepository`, і `UserRepository` використовують його без дублювання сигнатур методів.
 
-Validation logic for entities is centralised inside constructors ([`Book.java#L14-L17`](src/main/java/com/library/model/Book.java#L14-L17), [`User.java#L15-L17`](src/main/java/com/library/model/User.java#L15-L17)) so it is never repeated at call sites.
-
----
-
-## 3. KISS (Keep It Simple, Stupid)
-
-- In-memory `Map<String, T>` storage keeps the repository implementations straightforward and dependency-free.
-- `Logger` is a plain class with three methods — no third-party logging framework overhead for a demo project.
-- Controllers are thin delegators: [`BookController`](src/main/java/com/library/controller/BookController.java) is under 30 lines.
+Логіка валідації зосереджена в конструкторах сутностей ([`Book.java#L14-L17`](src/main/java/com/library/model/Book.java#L14-L17), [`User.java#L15-L17`](src/main/java/com/library/model/User.java#L15-L17)) і ніколи не повторюється на місцях виклику.
 
 ---
 
-## 4. YAGNI (You Aren't Gonna Need It)
+## 3. KISS (Keep It Simple, Stupid — роби простіше)
 
-The project contains only features required by the current task:
-- No pagination, no caching, no serialisation, no REST layer — these would be premature additions.
-- `User` holds only `id`, `name`, `email`, and a list of borrowed ISBNs; no roles, permissions, or audit trail that are not yet needed.
-
----
-
-## 5. Fail Fast
-
-Constructors validate their arguments immediately and throw `IllegalArgumentException` before an object can enter an invalid state:
-
-- [`Book.java#L14-L17`](src/main/java/com/library/model/Book.java#L14-L17) — rejects blank ISBN or title.
-- [`User.java#L15-L17`](src/main/java/com/library/model/User.java#L15-L17) — rejects blank id or malformed email.
-
-Business-rule violations in `LibraryService` throw `IllegalStateException` at the earliest possible point before any state mutation occurs ([`LibraryService.java#L49-L56`](src/main/java/com/library/service/LibraryService.java#L49-L56)).
+- Зберігання в пам'яті через `Map<String, T>` робить реалізації репозиторіїв простими і без зайвих залежностей.
+- `Logger` — звичайний клас з трьома методами, без зайвих фреймворків для логування.
+- Контролери є тонкими делегаторами: [`BookController`](src/main/java/com/library/controller/BookController.java) займає менше 30 рядків.
 
 ---
 
-## 6. Composition Over Inheritance
+## 4. YAGNI (You Aren't Gonna Need It — тобі це не знадобиться)
 
-`LibraryService` is composed of a `BookRepository`, a `UserRepository`, and a `Logger` — all injected via the constructor. There is no inheritance hierarchy between service and repository, which keeps coupling low and makes unit-testing straightforward by substituting any dependency.
+Проєкт містить лише те, що потрібно для поточного завдання:
+- Немає пагінації, кешування, серіалізації, REST-шару — це було б передчасним ускладненням.
+- `User` містить лише `id`, `name`, `email` та список ISBN взятих книг — без ролей, прав доступу чи журналу аудиту, які ще не потрібні.
 
 ---
 
-## 7. Encapsulation
+## 5. Fail Fast (падай швидко)
 
-- `Book` exposes `isAvailable()` as a boolean flag but keeps the internal `available` field private; callers cannot break invariants by directly flipping it.
-- `User.getBorrowedIsbns()` returns an [`unmodifiableList`](src/main/java/com/library/model/User.java#L27) so callers cannot mutate the internal list:
+Конструктори перевіряють аргументи одразу і кидають `IllegalArgumentException` до того, як об'єкт може потрапити в некоректний стан:
+
+- [`Book.java#L14-L17`](src/main/java/com/library/model/Book.java#L14-L17) — відхиляє порожній ISBN або назву.
+- [`User.java#L15-L17`](src/main/java/com/library/model/User.java#L15-L17) — відхиляє порожній id або некоректний email.
+
+Порушення бізнес-правил у `LibraryService` кидають `IllegalStateException` якомога раніше, до будь-якої зміни стану ([`LibraryService.java#L49-L56`](src/main/java/com/library/service/LibraryService.java#L49-L56)).
+
+---
+
+## 6. Композиція замість наслідування
+
+`LibraryService` складається з `BookRepository`, `UserRepository` і `Logger` — всі передаються через конструктор. Між сервісом і репозиторіями немає ієрархії наслідування, що зменшує зв'язність і спрощує тестування через підміну залежностей.
+
+---
+
+## 7. Інкапсуляція
+
+- `Book` надає `isAvailable()` як булевий прапор, але тримає внутрішнє поле `available` приватним — зовнішній код не може зламати інваріанти напряму.
+- `User.getBorrowedIsbns()` повертає [`unmodifiableList`](src/main/java/com/library/model/User.java#L27), щоб зовнішній код не міг змінити внутрішній список напряму:
 
 ```java
 return Collections.unmodifiableList(borrowedIsbns);
 ```
 
-Mutation is only allowed through the controlled `addBorrow` / `removeBorrow` methods.
+Зміна списку дозволена лише через контрольовані методи `addBorrow` / `removeBorrow`.
