@@ -6,6 +6,7 @@ import com.library.repository.Repository;
 import com.library.model.Book;
 import com.library.model.User;
 import com.library.util.Logger;
+import com.library.repository.BookRepositoryInterface;
 
 import java.util.List;
 
@@ -17,11 +18,11 @@ public class LibraryService {
 
     private static final int MAX_BORROWS = 5;
 
-    private final Repository<Book, String> bookRepository;
-private final Repository<User, String> userRepository;
+    private final BookRepositoryInterface bookRepository;
+    private final Repository<User, String> userRepository;
     private final Logger logger;
 
-    public LibraryService(Repository<Book, String> bookRepository,
+    public LibraryService(BookRepositoryInterface bookRepository,
                       Repository<User, String> userRepository,
                       Logger logger) {
         this.bookRepository = bookRepository;

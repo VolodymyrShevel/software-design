@@ -1,5 +1,6 @@
 package com.library;
 
+import com.library.repository.BookRepositoryInterface;
 import com.library.controller.BookController;
 import com.library.controller.BorrowController;
 import com.library.model.User;
@@ -12,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         // --- Wiring ---
         Logger logger = new Logger();
-        BookRepository bookRepo = new BookRepository();
+        BookRepositoryInterface bookRepo = new BookRepository();
         UserRepository userRepo = new UserRepository();
         LibraryService service = new LibraryService(bookRepo, userRepo, logger);
         BookController bookController = new BookController(service);

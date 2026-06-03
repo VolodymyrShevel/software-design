@@ -5,7 +5,7 @@ import com.library.model.Book;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class BookRepository implements Repository<Book, String> {
+public class BookRepository implements BookRepositoryInterface {
     private final Map<String, Book> store = new LinkedHashMap<>();
 
     @Override
