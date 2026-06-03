@@ -7,6 +7,7 @@ import com.library.model.Book;
 import com.library.model.User;
 import com.library.util.Logger;
 import com.library.repository.BookRepositoryInterface;
+import com.library.util.ILogger;
 
 import java.util.List;
 
@@ -20,11 +21,11 @@ public class LibraryService {
 
     private final BookRepositoryInterface bookRepository;
     private final Repository<User, String> userRepository;
-    private final Logger logger;
+    private final ILogger logger;
 
     public LibraryService(BookRepositoryInterface bookRepository,
                       Repository<User, String> userRepository,
-                      Logger logger) {
+                      ILogger logger) {
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
         this.logger = logger;

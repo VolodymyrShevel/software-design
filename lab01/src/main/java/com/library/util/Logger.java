@@ -3,7 +3,7 @@ package com.library.util;
 /**
  * Simple console logger. Extracted to follow SRP and allow substitution (DIP).
  */
-public class Logger {
+public class Logger implements ILoger {
     public void info(String message) {
         System.out.println("[INFO]  " + message);
     }
