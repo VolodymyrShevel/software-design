@@ -7,11 +7,13 @@ public class Virus implements Cloneable {
     private String name;
     private String species;
     private List<Virus> children;
+    
     public Virus(String name, String species, double weight, int age) {
         this.name = name; this.species = species; this.weight = weight; this.age = age;
         this.children = new ArrayList<>();
     }
     public void addChild(Virus child) { children.add(child); }
+    
     @Override
     public Virus clone() {
         try {
