@@ -5,7 +5,7 @@ Online Library — система управління бібліотекою.
 ## Виконані завдання
 
 ### Завдання 1 — Принципи програмування
-Описано у файлі [PROGRAMMING_PRINCIPLES.md](lab01/PROGRAMMING_PRINCIPLES.md).  
+Описано у файлі [PROGRAMMING_PRINCIPLES.md](/lab01/PROGRAMMING_PRINCIPLES.md).
 Принципи: SOLID, DRY, KISS, YAGNI, Fail Fast, Composition over Inheritance, Encapsulation.
 
 ### Завдання 2 — Issues
