@@ -27,7 +27,7 @@
 
 ### Task 01 — Adapter
 ```
-![alt text](image-1.png)
+![alt text](/image-1.png)
 ```
 
 ### Task 02 — Decorator
