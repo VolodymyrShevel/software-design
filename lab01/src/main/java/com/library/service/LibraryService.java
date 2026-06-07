@@ -3,9 +3,6 @@ package com.library.service;
 import com.library.model.Book;
 import com.library.model.User;
 import com.library.repository.Repository;
-import com.library.model.Book;
-import com.library.model.User;
-import com.library.util.Logger;
 import com.library.repository.BookRepositoryInterface;
 import com.library.util.ILogger;
 
